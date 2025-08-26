@@ -3,14 +3,44 @@
 import { useState, useRef, useEffect } from "react"
 import { Check, Star, CreditCard, X, CheckCircle } from "lucide-react"
 import gsap from "gsap"
+import { EmbeddedCheckout, EmbeddedCheckoutProvider, LinkAuthenticationElement } from "@stripe/react-stripe-js"
+import { loadStripe } from "@stripe/stripe-js"
+import Link from 'next/link'
 
-export default function SubscriptionPage() {
+// Importa la Server Action para obtener el client secret
+import { fetchClientSecret } from "../actions/stripe"
+import ButtonBack from "../dashboard/components/buttonBack"
+
+// Carga Stripe fuera del componente para evitar recargas innecesarias
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null
+
+// El componente ahora recibe 'plan' directamente, no 'plans'
+export default function SubscriptionClientPage({ plan }) {
   const [expanded, setExpanded] = useState(false)
-  const containerRef = useRef(null) // El contenedor principal, la "card grande de fondo"
-  const paymentRef = useRef(null) // El panel de pago que se desliza
+  const containerRef = useRef(null)
+  const paymentRef = useRef(null)
+
+  // Opciones para Stripe Embedded Checkout
+  // Solo se define si plan y stripePromise están disponibles
+  const options =
+    plan && stripePromise
+      ? {
+          fetchClientSecret: async () => {
+            try {
+              // Pasa el stripe_price_id del plan seleccionado a la Server Action
+              const clientSecret = await fetchClientSecret(plan.stripe_price_id)
+              return clientSecret
+            } catch (error) {
+              console.error("Error en fetchClientSecret:", error)
+              throw error // Re-lanza el error para que Stripe.js lo maneje
+            }
+          },
+        }
+      : undefined // options será undefined si plan o stripePromise no están listos
 
   useEffect(() => {
-    // Establecer el estado inicial de la tarjeta de pago (oculta)
     gsap.set(paymentRef.current, { width: 0, opacity: 0, overflow: "hidden" })
   }, [])
 
@@ -18,112 +48,126 @@ export default function SubscriptionPage() {
     const tl = gsap.timeline({ defaults: { ease: "power2.out", duration: 0.4 } })
 
     if (expanded) {
-      // Expandir el contenedor principal para hacer espacio para la tarjeta de pago
-      tl.to(containerRef.current, { width: "720px" }) // 360px (plan) + 360px (pago)
-      // Revelar la tarjeta de pago
-      tl.to(paymentRef.current, { width: "360px", opacity: 1, overflow: "visible" }, "<0.1") // Inicia un poco después
+      // Aumentamos el ancho total para dar más espacio al panel de pago
+      tl.to(containerRef.current, { width: "810px" }) // 360px (plan) + 450px (pago)
+      // El panel de pago ahora tendrá 450px de ancho
+      tl.to(paymentRef.current, { width: "450px", opacity: 1, overflow: "visible" }, "<0.1")
     } else {
-      // Ocultar la tarjeta de pago
       tl.to(paymentRef.current, { width: 0, opacity: 0, overflow: "hidden" })
-      // Encoger el contenedor principal
-      tl.to(containerRef.current, { width: "360px" }, "<0.1") // Inicia un poco después
+      tl.to(containerRef.current, { width: "360px" }, "<0.1")
     }
   }, [expanded])
 
+  // Si el plan no se pasa (lo cual no debería ocurrir si el Server Component funciona bien)
+  if (!plan) {
+    return <div className="min-h-screen flex justify-center items-center">Plan no disponible.</div>
+  }
+
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-blue-100 via-blue-50 to-blue-200">
+    <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-white">
+      <div className="absolute top-6 left-6 z-20">
+        <ButtonBack />
+      </div>
       <div
         ref={containerRef}
-        className="bg-[#1A202C] rounded-2xl shadow-2xl overflow-hidden flex relative"
-        style={{ width: "360px", height: "650px" }} // Ancho inicial de la tarjeta de información, altura fija y más grande
+        className="h-max bg-gray-900 rounded-2xl shadow-2xl overflow-hidden flex relative border border-gray-700"
+        style={{ width: "360px", height: "750px" }} // Altura reducida, pero con más espacio horizontal
       >
         {/* Logo y nombre de la marca - siempre visible en la card grande */}
-        <div className="absolute top-6 left-6 flex items-center gap-2 text-white z-10">
-          <img src="/icon-Brand.svg" className="size-8" alt="midudev logo" />
+        <Link 
+          href={'/'}
+          className="absolute top-6 left-6 flex items-center gap-2 text-white z-10">
+          <img src="/icon-Brand.svg" className="size-8" alt="Learnix logo" />
           <span className="text-xl font-semibold">Learnix</span>
-        </div>
+        </Link>
 
         {/* Contenedor para las dos secciones principales (plan y pago) */}
-        <div className="flex w-full">
+        <div className="flex h-full w-full">
           {/* 🟦 Información del plan (Tarjeta 1 - contenido fijo dentro de la card grande) */}
-          <div className="flex-shrink-0 w-[360px] p-6 pt-20 flex flex-col justify-between">
-            <div className="flex flex-col w-full bg-[#2D3748] rounded-xl shadow-lg p-6 text-white relative">
-              {/* Badge PRO - posicionado para superponerse ligeramente */}
-              <div className="absolute -top-3 -left-3 bg-gradient-to-r from-indigo-500 to-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md flex items-center gap-1">
-                <Star className="size-3.5" /> PRO
-              </div>
+          {/* Ajustes para centrar la tarjeta oscura y el texto de seguridad al final */}
+          <div className="flex-shrink-0 w-[360px] p-6 flex flex-col justify-between">
+            {/* Este div flex-1 centrará la tarjeta del plan dentro del espacio disponible */}
+            <div className="flex-1 flex items-center justify-center">
+              <div className="flex flex-col w-full bg-gray-800 rounded-xl shadow-lg p-6 text-white relative border border-gray-700">
+                {/* Badge PRO - posicionado para superponerse ligeramente */}
+                {plan.badge && (
+                  <div
+                    className={`absolute -top-3 -left-3 bg-gradient-to-r ${plan.badge.color} text-white text-xs font-semibold px-3 py-1 rounded-full shadow-md flex items-center gap-1`}
+                  >
+                    <Star className="size-3.5" /> {plan.badge.text}
+                  </div>
+                )}
 
-              {/* Placeholder para el selector de plan (Plan Anual) */}
-              <div className="mb-6">
-                <div className="inline-flex items-center gap-2 bg-blue-600/20 text-blue-300 text-sm font-medium px-3 py-1 rounded-full">
-                  <div className="w-2 h-2 bg-blue-400 rounded-full" />
-                  Plan Anual
+                {/* Placeholder para el selector de plan (Plan Anual) */}
+                <div className="mb-6">
+                  <div className="inline-flex items-center gap-2 bg-blue-900/30 text-blue-300 text-sm font-medium px-3 py-1 rounded-full">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full" />
+                    Plan Anual
+                  </div>
                 </div>
-              </div>
 
-              <h2 className="text-xl font-semibold text-gray-100 mb-1">Plan Profesional</h2>
-              <p className="text-sm text-gray-300 mb-4">Ideal para estudiantes autodidactas.</p>
+                <h2 className="text-xl font-semibold text-white mb-1">{plan.name}</h2>
+                <ul className="space-y-2 text-gray-300 text-sm mb-6">
+                  {Object.values(plan.description).map((feature, index) => (
+                    <li key={index} className="flex items-center gap-2">
+                      <Check className="text-green-400 size-4" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
 
-              <ul className="space-y-2 text-gray-200 text-sm mb-6">
-                <li className="flex items-center gap-2">
-                  <Check className="text-green-400 size-4" />
-                  Acceso completo a todos los cursos.
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="text-green-400 size-4" />
-                  Recursos descargables ilimitados.
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="text-green-400 size-4" />
-                  Soporte prioritario.
-                </li>
-              </ul>
-
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col">
-                  <span className="text-2xl font-bold text-gray-100">$4.990</span>
-                  <span className="text-sm text-gray-300">por mes</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-2xl font-bold text-white">
+                      ${plan.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-sm text-gray-400">por mes</span>
+                  </div>
+                  <button
+                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-4 py-2 font-medium transition-transform duration-200 hover:scale-[1.02] shadow-md"
+                    onClick={() => setExpanded(true)}
+                  >
+                    Suscribirme
+                  </button>
                 </div>
-                <button
-                  className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-4 py-2 font-medium transition-transform duration-200 hover:scale-[1.02] shadow-md"
-                  onClick={() => setExpanded(true)}
-                >
-                  Suscribirme
-                </button>
               </div>
             </div>
-            {/* Texto de pago seguro - AHORA DENTRO DE LA TARJETA NEGRA */}
-            <p className="text-sm text-gray-400 text-center mt-auto pb-4">
-              {" "}
-              {/* mt-auto para empujar al final */}
-              <CheckCircle className="inline-block size-4 mr-1" /> Pago 100% seguro con cifrado SSL
+            {/* Texto de pago seguro - Ahora al final del contenedor flex-col principal */}
+            <p className="text-sm text-gray-500 text-center pb-4">
+              <CheckCircle className="inline-block size-4 mr-1 text-green-500" /> Pago 100% seguro con cifrado SSL
             </p>
           </div>
 
           {/* ⚪ Panel de pago (Tarjeta 2 - se desliza desde la derecha) */}
-          <div ref={paymentRef} className="flex-shrink-0 w-[360px] p-6 bg-white flex flex-col justify-between">
+          {/* Ajustes de padding y scroll para el checkout */}
+          <div
+            ref={paymentRef}
+            className="flex-shrink-0 w-[450px] p-8 bg-gray-900 flex flex-col justify-between overflow-y-auto scrollbar-hide border-l border-gray-700"
+          >
             <div className="flex justify-between items-center mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                <CreditCard className="size-5 text-gray-600" />
+              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                <CreditCard className="size-5 text-gray-400" />
                 Confirmar compra
               </h3>
-              <button onClick={() => setExpanded(false)} className="text-gray-500 hover:text-gray-700">
+              <button onClick={() => setExpanded(false)} className="text-gray-400 hover:text-gray-200">
                 <X className="size-4" />
               </button>
             </div>
 
-            <div className="flex-1 flex items-center justify-center text-center text-gray-500 px-4">
-              <p>Aquí irá el formulario de Stripe o el redireccionamiento.</p>
+            <div className="flex-1 text-gray-300 overflow-scroll">
+              {/* Renderiza el checkout de Stripe solo si el plan está disponible y stripePromise es válido */}
+              {plan && stripePromise && options && (
+                <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
+                  <EmbeddedCheckout />
+                </EmbeddedCheckoutProvider>
+              )}
+              {/* Mensaje si Stripe no está configurado */}
+              {!stripePromise && (
+                <div className="text-center text-red-400">
+                  Stripe no está configurado. Por favor, añade NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.
+                </div>
+              )}
             </div>
-
-            <button
-              className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md py-2 transition-all duration-200 shadow-md"
-              onClick={() => {
-                // Lógica para iniciar Stripe Checkout
-              }}
-            >
-              Proceder con Stripe
-            </button>
           </div>
         </div>
       </div>

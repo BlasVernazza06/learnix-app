@@ -1,116 +1,83 @@
-import React from 'react'
+'use client'
 
-const cursos = [
-  {
-    titulo: 'Introduction to Python',
-    lecciones: '5 of 12 Lessons',
-    imagen: '/courses/python-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'Web Development',
-    lecciones: 'Start Course.',
-    imagen: '/courses/web-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'Basic Algebra',
-    lecciones: 'Lesson 2 of 5',
-    imagen: '/courses/algebra-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'JavaScript Essentials',
-    lecciones: '8 of 20 Lessons',
-    imagen: '/courses/js-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'React for Beginners',
-    lecciones: '3 of 15 Lessons',
-    imagen: '/courses/react-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'Node.js & Express',
-    lecciones: 'Start Course.',
-    imagen: '/courses/node-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'SQL Databases',
-    lecciones: 'Lesson 1 of 10',
-    imagen: '/courses/sql-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'DevOps Fundamentals',
-    lecciones: 'Start Course.',
-    imagen: '/courses/devops-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'Linux Basics',
-    lecciones: '2 of 8 Lessons',
-    imagen: '/courses/linux-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'UI/UX Design',
-    lecciones: 'Start Course.',
-    imagen: '/courses/uiux-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'Machine Learning',
-    lecciones: 'Lesson 4 of 18',
-    imagen: '/courses/ml-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'Cybersecurity Basics',
-    lecciones: 'Start Course.',
-    imagen: '/courses/cyber-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'Cloud Computing',
-    lecciones: 'Lesson 3 of 12',
-    imagen: '/courses/cloud-owl.svg',
-    link: '#'
-  },
-  {
-    titulo: 'Git & Version Control',
-    lecciones: 'Start Course.',
-    imagen: '/courses/git-owl.svg',
-    link: '#'
-  }
-]
+import Image from "next/image"
+import Link from "next/link"
+import { AllCourses } from "../actions/courses";
+
+
 
 export default function Courses() {
+  const {courses, loading, error} = AllCourses()
+
+  const slugify = (text) => {
+    return text
+      .normalize('NFD')                  // separa acentos
+      .replace(/[\u0300-\u036f]/g, '')    // quita acentos
+      .toLowerCase()
+      .replace(/[¿?]/g, '')               // quita signos de pregunta
+      .replace(/[^a-z0-9\s-]/g, '')       // quita símbolos pero deja espacios y guiones
+      .trim()                             // quita espacios al inicio y final
+      .replace(/\s+/g, '-')               // espacios por guion
+      .replace(/-+/g, '-');               // evita guiones repetidos
+  };
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {Array.from({ length: 8 }).map((_, idx) => (
+          <div
+            key={idx}
+            className="flex flex-col overflow-hidden rounded-2xl shadow-xl border border-gray-700 bg-gray-900 animate-pulse"
+          >
+            {/* Imagen */}
+            <div className="relative w-full h-48 bg-gray-700 rounded-t-2xl"></div>
+  
+            {/* Contenido */}
+            <div className="flex flex-col items-center text-center p-5 space-y-2">
+              <div className="h-6 w-32 bg-gray-600 rounded-full"></div>
+              <div className="h-4 w-24 bg-gray-600 rounded-full"></div>
+  
+              {/* Botón */}
+              <div className="mt-4 w-full py-2 px-4 bg-gray-700 rounded-xl"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div 
-      className="mt-16 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-      {cursos.map((curso, idx) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {courses.map((curso, idx) => (
         <div
           key={idx}
-          className="bg-white rounded-2xl shadow-md border border-gray-100 flex flex-col items-center p-6 min-h-[260px] transition-transform hover:scale-105 duration-300"
+          className="flex flex-col overflow-hidden rounded-2xl shadow-xl border border-gray-700 bg-gray-900 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl"
         >
-          <img
-            src={curso.imagen}
-            alt={curso.titulo}
-            className="w-20 h-20 object-contain mb-4"
-          />
-          <h3 className="text-xl font-bold text-gray-900 mb-1 text-center">{curso.titulo}</h3>
-          <p className="text-gray-500 text-sm mb-4 text-center">{curso.lecciones}</p>
-          <a
-            href={curso.link}
-            className="mt-auto inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors duration-200"
-          >
-            Start Course
-          </a>
+          <div className="relative w-full h-48">
+            <Image
+              src={curso.image || "/placeholder.svg"}
+              alt={curso.title}
+              fill
+              className="object-cover rounded-t-2xl"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent rounded-t-2xl"></div>
+          </div>
+  
+          <div className="flex flex-col items-center text-center p-5 space-y-2">
+            <h3 className="text-lg md:text-xl font-bold text-white">{curso.title}</h3>
+            <p className="text-gray-400 text-sm">{curso.lessons} lecciones</p>
+  
+            <Link
+              href={`/dashboard/course/${curso.title.toLowerCase().replace(/\s+/g, '-')}`}
+              className="mt-4 w-full py-2 px-4 bg-gradient-to-r from-blue-600 to-blue-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-700 hover:scale-105 transition-transform duration-300"
+            >
+              Empezar Curso
+            </Link>
+          </div>
         </div>
       ))}
     </div>
   )
+  
 }

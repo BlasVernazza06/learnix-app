@@ -8,18 +8,30 @@ export async function login(formData) {
 
   const data = {
     email: formData.get("email"),
-    password: formData.get("password"),
+    password: formData.get("password")
   }
 
-  console.log("Attempting login with:", { email: data.email }) // Para debug
-
-  const { error } = await supabase.auth.signInWithPassword(data)
-
-  if (error) {
-    console.error("Login error:", error.message) // Para debug
-    redirect("/login?error=" + encodeURIComponent(error.message))
+  // Validación básica
+  if (!data.email || !data.password) {
+    return redirect("/login?error=Email y contraseña son requeridos")
   }
 
-  revalidatePath("/", "layout")
-  redirect("/")
+  try {
+    const { error } = await supabase.auth.signInWithPassword(data)
+
+    if (error) {
+      console.log(error)
+      // Manejo de errores de Supabase
+      return redirect(`/login?error=${encodeURIComponent(error.message)}`)
+    }
+
+    // Revalidar y redirigir tras inicio de sesión exitoso
+    revalidatePath("/", "layout")
+    redirect("/")
+
+  } catch (err) {
+    // Captura de errores inesperados
+    console.error("Error de inicio de sesión:", err)
+    return redirect("/login?error=Ha ocurrido un error inesperado")
+  }
 }
