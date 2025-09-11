@@ -3,9 +3,12 @@ import { useState, useRef } from 'react'
 import { Search, Bell, User } from "lucide-react"
 import Link from "next/link"
 import UserModal from "@/app/ui/userModal"
+import { Menu } from 'lucide-react'
+import ToggleButton from './ToggleButton'
 
 export default function DashHeader({ user }) {
   const [modalOpen, setModalOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false) // ← Esta línea faltaba
   const userButtonRef = useRef(null)
   const userData = user
 
@@ -22,9 +25,6 @@ export default function DashHeader({ user }) {
 
       {/* Iconos de notificación y usuario */}
       <div className="flex items-center gap-4 ml-auto">
-        <button className="p-2 rounded-xl text-gray-400 hover:bg-gray-800 hover:text-blue-400 transition-colors shadow-sm">
-          <Bell className="w-5 h-5" />
-        </button>
 
         <div className="flex items-center gap-2 sm:gap-4 relative">
           {userData ? (
@@ -56,6 +56,10 @@ export default function DashHeader({ user }) {
           )}
           {modalOpen && user && <UserModal user={userData} />}
         </div>
+      </div>
+
+      <div className='flex items-center'>
+        <ToggleButton isOpen={isOpen} onToggle={() => setIsOpen(!isOpen)}/>
       </div>
     </div>
   )

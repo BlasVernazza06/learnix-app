@@ -5,6 +5,7 @@ import { Home, BookOpen, Menu, ChevronsRight } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import gsap from "gsap"
+import ToggleButton from "./ToggleButton"
 
 export default function SideNav() {
   const [isOpen, setIsOpen] = useState(true)
@@ -30,17 +31,10 @@ export default function SideNav() {
   return (
     <div
       ref={sidenavRef}
-      className="flex flex-col min-h-screen w-64 py-4 bg-gray-900 text-gray-300 shadow-2xl border-r border-gray-800 overflow-hidden"
+      className="flex-col min-h-screen w-64 py-4 bg-gray-900 text-gray-300 shadow-2xl border-r border-gray-800 overflow-hidden hidden md:flex"
     >
       {/* Toggle */}
-      <div className="flex justify-start  items-center pl-4 mb-4">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex p-2 text-gray-400 justify-center items-center hover:text-white hover:bg-gray-800 rounded-xl transition" title={`${isOpen ? "Contraer Menu" : "Expandir Menu"}`}
-        >
-          <ChevronsRight className={`w-6 h-6 ${isOpen ? "rotate-180 transition-all duration-300" : "rotate-0 transition-all duration-300"}`} />
-        </button>
-      </div>
+      <ToggleButton isOpen={isOpen} onToggle={() => setIsOpen(!isOpen)}/>
 
       {/* Logo */}
       <Link

@@ -14,7 +14,6 @@ export default function HeaderStart({ user }) {
 
   const Links = [
     { name: "Pricing", icon: Wallet, nav: "#pricing" },
-    { name: "Contactanos", icon: Headset, nav: "#contacts" },
     { name: "FAQ", icon: CircleQuestionMark, nav: "#FAQ" },
   ]
 
