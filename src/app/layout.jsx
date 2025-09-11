@@ -9,6 +9,9 @@ const inter = Inter({
 export const metadata = {
   title: "Learnix",
   description: "Academia de Conocimientos del Sector IT",
+  icons: {
+    icon: "/icon-Brand.svg", // o favicon.svg
+  },
 };
 
 export default function RootLayout({ children }) {
