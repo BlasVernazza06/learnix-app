@@ -4,7 +4,7 @@ import { ChevronsRight } from "lucide-react"
 
 export default function ToggleButton({ isOpen, onToggle }) {
   return (
-    <div className="flex justify-start items-center pl-4 mb-4">
+    <div className="flex justify-start items-start ">
       <button
         onClick={onToggle}
         className="flex p-2 text-gray-400 justify-center items-center hover:text-white hover:bg-gray-800 rounded-xl transition"

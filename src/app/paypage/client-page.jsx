@@ -87,8 +87,8 @@ export default function SubscriptionClientPage({ plan }) {
           {/* Ajustes para centrar la tarjeta oscura y el texto de seguridad al final */}
           <div className="flex-shrink-0 w-[360px] p-6 flex flex-col justify-between">
             {/* Este div flex-1 centrará la tarjeta del plan dentro del espacio disponible */}
-            <div className="flex-1 flex items-center justify-center">
-              <div className="flex flex-col w-full bg-gray-800 rounded-xl shadow-lg p-6 text-white relative border border-gray-700">
+            <div className="flex flex-col items-center justify-center mt-12">
+              <div className="flex flex-col mb-5 w-full bg-gray-800 rounded-xl shadow-lg p-6 text-white relative border border-gray-700">
                 {/* Badge PRO - posicionado para superponerse ligeramente */}
                 {plan.badge && (
                   <div
@@ -131,9 +131,49 @@ export default function SubscriptionClientPage({ plan }) {
                   </button>
                 </div>
               </div>
+
+              <div className="flex flex-col w-full bg-gray-800 rounded-xl shadow-lg p-6 text-white relative border border-gray-700">
+                <h3 className="text-lg font-semibold mb-3">Datos de prueba</h3>
+                <p className="text-sm text-gray-400 mb-4">
+                  Usa estos datos para simular una suscripción en modo <span className="text-yellow-400 font-medium">TEST</span>.
+                </p>
+
+                <ul className="space-y-2 text-[12px]">
+                  <li className="flex items-center gap-2">
+                    <Check className="text-green-400 size-4" />
+                    <span>
+                      <strong>Número de tarjeta:</strong> 4242 4242 4242 4242
+                    </span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="text-green-400 size-4" />
+                    <span>
+                      <strong>Fecha:</strong> Cualquier futura (ej: 12/34)
+                    </span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="text-green-400 size-4" />
+                    <span>
+                      <strong>CVC:</strong> Cualquier valor (ej: 123)
+                    </span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="text-green-400 size-4" />
+                    <span>
+                      <strong>Correo:</strong> correo@ejemplo.com
+                    </span>
+                  </li>
+                </ul>
+
+                <p className="text-xs text-gray-500 mt-4">
+                  ⚠️ Solo disponible en modo prueba. No se realizará ningún cargo real.
+                </p>
+              </div>
+
+
             </div>
             {/* Texto de pago seguro - Ahora al final del contenedor flex-col principal */}
-            <p className="text-sm text-gray-500 text-center pb-4">
+            <p className="text-sm text-gray-500 text-center">
               <CheckCircle className="inline-block size-4 mr-1 text-green-500" /> Pago 100% seguro con cifrado SSL
             </p>
           </div>
