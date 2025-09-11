@@ -2,11 +2,12 @@
 
 import { X, Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { login } from "./action"
 
-export default function Page() {
+// Componente que usa useSearchParams
+function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState({})
   const [isPending, setIsPending] = useState(false)
@@ -184,5 +185,18 @@ export default function Page() {
         </form>
       </div>
     </div>
+  )
+}
+
+// Componente principal que envuelve LoginForm con Suspense
+export default function Page() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800">
+        <div className="text-white">Cargando...</div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }
