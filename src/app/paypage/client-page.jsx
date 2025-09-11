@@ -70,8 +70,8 @@ export default function SubscriptionClientPage({ plan }) {
       </div>
       <div
         ref={containerRef}
-        className="h-max bg-gray-900 rounded-2xl shadow-2xl overflow-hidden flex relative border border-gray-700"
-        style={{ width: "360px", height: "750px" }} // Altura reducida, pero con más espacio horizontal
+        className="h-full bg-gray-900 rounded-2xl shadow-2xl overflow-hidden flex relative border border-gray-700"
+        style={{ width: "360px", height: "790px" }} // Altura reducida, pero con más espacio horizontal
       >
         {/* Logo y nombre de la marca - siempre visible en la card grande */}
         <Link 
