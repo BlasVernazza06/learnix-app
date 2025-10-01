@@ -1,9 +1,8 @@
-import Courses from "../sections/courses"
-import Pricing from "../sections/pricing"
-import FAQ from "../sections/faq"
+import Courses from "./sections/courses"
+import Pricing from "./sections/pricing"
+import FAQ from "./sections/faq"
 import Link from "next/link"
 import { createClient } from "@/utils/supabase/server"
-import HeaderStart from "@/app/ui/headerstart"
 
 export default async function Home() {
   const supabase = await createClient()
@@ -14,7 +13,6 @@ export default async function Home() {
   // Por lo tanto, la sección del héroe solo mostrará los botones de registro/login.
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 text-white">
-      {/* HeaderStart se renderiza en app/layout.jsx */}
       <main className="flex flex-col items-center justify-center flex-1 pt-24 pb-16">
         <div className="max-w-5xl w-full px-6 sm:px-8 lg:px-10">
           <section className="text-center py-16 md:py-24">

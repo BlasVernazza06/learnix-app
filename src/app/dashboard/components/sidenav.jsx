@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Home, BookOpen, X } from "lucide-react"
+import { Home, BookOpen, X, Settings } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import gsap from "gsap"
@@ -119,84 +119,106 @@ export default function SideNav() {
       {/* Sidebar */}
       <div
         ref={sidenavRef}
-        className="flex flex-col h-screen w-64 py-4 bg-gray-900 text-gray-300 shadow-2xl border-r border-gray-800 overflow-hidden md:relative fixed top-0 left-0 z-50"
+        className="flex flex-col justify-between h-screen w-[36vw] md:w-64 py-4 bg-gray-900 text-gray-300 shadow-2xl border-r border-gray-800 overflow-hidden md:relative fixed top-0 left-0 z-50 max-w-sm"
       >
-        {/* Header del sidebar */}
-        <div className="flex justify-between items-center px-4 md:justify-center">
-          {/* Botón X para cerrar en responsive */}
-          <button
-            onClick={() => setIsResponsiveOpen(false)}
-            className="flex md:hidden p-2 text-gray-400 justify-center items-center hover:text-white hover:bg-gray-800 rounded-xl transition"
-          >
-            <X className="w-6 h-6" />
-          </button>
-          
-          {/* Toggle para desktop */}
-          <div className="hidden md:block">
-            <ToggleButton 
-              isOpen={isDesktopOpen} 
-              onToggle={() => setIsDesktopOpen(!isDesktopOpen)}
-            />
-          </div>
-        </div>
+        <div>
+          {/* Encabezado: Toggle y Logo en el mismo nivel */}
+          <div className="w-full flex items-center justify-between gap-3 px-4 pb-4 border-b border-gray-800 mt-0">
+            {/* Botón X para cerrar en responsive */}
+            <button
+              onClick={() => setIsResponsiveOpen(false)}
+              className="flex md:hidden p-2 text-gray-400 justify-center items-center hover:text-white hover:bg-gray-800 rounded-xl transition"
+            >
+              <X className="w-6 h-6" />
+            </button>
 
-        {/* Logo */}
-        <Link
-          href="/"
-          className="flex items-center gap-3 px-4 pb-6 border-b border-gray-800 cursor-pointer hover:opacity-90 transition-opacity mt-4 md:mt-0"
-          onClick={handleLinkClick}
-        >
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-600 flex items-center justify-center shadow-md flex-shrink-0">
-            <img src="/icon-Brand.svg" alt="Learnix Logo" className="w-6 h-6" />
-          </div>
-          <span 
-            className={`text-xl font-bold text-white transition-opacity duration-300 ${
-              !isDesktopOpen && window.innerWidth >= 768 ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
-            }`}
-          >
-            Learnix
-          </span>
-        </Link>
-
-        {/* Menú */}
-        <ul className="flex-1 space-y-2 px-2 mt-6">
-          {navItems.map((item) => {
-            const isActive = item.includes
-              ? pathname.includes(item.includes)
-              : pathname === item.href
-
-            return (
-              <li key={item.name}>
+            {/* Logo: visible solo cuando el sidenav está expandido en desktop */}
+            <div className="w-full flex items-center justify-between gap-3">
+              {isDesktopOpen && (
                 <Link
-                  href={item.href}
+                  href="/"
+                  className="flex items-center gap-3 cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={handleLinkClick}
-                  className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${
-                    isActive
-                      ? "bg-gradient-to-r from-blue-600/30 to-blue-500/20 border border-blue-500 shadow-md text-blue-500"
-                      : "hover:bg-gray-800 hover:text-white"
-                  }`}
                 >
-                  <item.icon
-                    className={`w-5 h-5 flex-shrink-0 transition-colors ${
-                      isActive ? "text-blue-500" : ""
-                    }`}
-                  />
-                  <span
-                    className={`text-[15px] font-medium transition-all duration-300 ${
-                      !isDesktopOpen && window.innerWidth >= 768 
-                        ? 'opacity-0 w-0 overflow-hidden' 
-                        : 'opacity-100'
-                    } ${
-                      isActive ? "text-blue-500" : ""
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-600 to-blue-600 flex items-center justify-center shadow-md flex-shrink-0">
+                    <img src="/icon-Brand.svg" alt="Learnix Logo" className="w-6 h-6" />
+                  </div>
+                  <span className="text-xl font-bold text-white">Learnix</span>
+                </Link>
+              )}
+
+              {/* Toggle para desktop al mismo nivel del logo */}
+              <div className="hidden md:block">
+                <ToggleButton 
+                  isOpen={isDesktopOpen} 
+                  onToggle={() => setIsDesktopOpen(!isDesktopOpen)}
+                />
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* Menú */}
+          <ul className="flex-1 space-y-2 px-2 mt-6">
+            {navItems.map((item) => {
+              const isActive = item.includes
+                ? pathname.includes(item.includes)
+                : pathname === item.href
+
+              return (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    onClick={handleLinkClick}
+                    className={`flex items-center gap-4 px-4 py-3 h-12 rounded-xl transition-all duration-200 border ${
+                      isActive
+                        ? "bg-gradient-to-r from-blue-600/30 to-blue-500/20 border-blue-500 shadow-md text-blue-500"
+                        : "border-transparent hover:bg-gray-800 hover:text-white"
                     }`}
                   >
-                    {item.name}
-                  </span>
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
+                    <item.icon
+                      className={`w-5 h-5 flex-shrink-0 transition-colors ${
+                        isActive ? "text-blue-500" : ""
+                      }`}
+                    />
+                    <span
+                      className={`text-[15px] font-medium transition-all duration-300 ${
+                        !isDesktopOpen && window.innerWidth >= 768 
+                          ? 'opacity-0 w-0 overflow-hidden' 
+                          : 'opacity-100'
+                      } ${
+                        isActive ? "text-blue-500" : ""
+                      }`}
+                    >
+                      {item.name}
+                    </span>
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+
+        <div className="space-y-2 px-2 ">
+          <Link
+            href={'/dashboard/settings'}
+            className={`flex items-center gap-4 px-4 py-3 h-12 rounded-xl transition-all duration-200 border border-transparent hover:bg-gray-800 hover:text-white
+              ${pathname === '/dashboard/settings' ? "bg-gradient-to-r from-blue-600/30 to-blue-500/20 border-blue-500 shadow-md text-blue-500" : "border-transparent hover:bg-gray-800 hover:text-white"}
+            `}
+          >
+            <Settings className="w-5 h-5 flex-shrink-0 transition-colors" />
+            <span
+              className={`text-[15px] font-medium transition-all duration-300 ${
+                !isDesktopOpen && window.innerWidth >= 768 
+                  ? 'opacity-0 w-0 overflow-hidden' 
+                  : 'opacity-100'
+              }`}
+            >
+              Configuracion
+            </span>
+          </Link>
+        </div>
       </div>
     </>
   )

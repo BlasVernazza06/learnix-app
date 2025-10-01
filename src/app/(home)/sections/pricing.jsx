@@ -2,7 +2,7 @@
 
 import { Check } from "lucide-react"
 import Link from "next/link"
-import { AllPricing } from "../actions/pricing"
+import { AllPricing } from "../../actions/pricing"
 
 export default function Pricing() {
   const { plans, loading, error } = AllPricing()
